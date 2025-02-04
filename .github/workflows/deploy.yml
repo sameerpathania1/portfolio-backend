@@ -1,0 +1,26 @@
+name: Deploy portfolio backend
+
+on:
+  push:
+    branches:
+      - main  # Run when code is pushed to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # GitHub-hosted runner
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3  # Gets latest code from repo
+
+      - name: SSH into EC2 and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}  # EC2 Public IP
+          username: ${{ secrets.EC2_USER }}  # SSH User (e.g., ubuntu)
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}  # Private key for SSH authentication
+          script: |
+            cd /home/ubuntu/project/portfolio-backend
+            git pull origin main
+            docker build -t backend-app .
+            docker restart apps-container
