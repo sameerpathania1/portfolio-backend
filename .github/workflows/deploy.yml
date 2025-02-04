@@ -1,26 +1,22 @@
-name: Deploy portfolio backend
+name: Build and Deploy Backend to GHCR
 
 on:
   push:
     branches:
-      - main  # Run when code is pushed to main
+      - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest  # GitHub-hosted runner
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3  # Gets latest code from repo
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: SSH into EC2 and Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}  # EC2 Public IP
-          username: ${{ secrets.EC2_USER }}  # SSH User (e.g., ubuntu)
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}  # Private key for SSH authentication
-          script: |
-            cd /home/ubuntu/project/portfolio-backend
-            git pull origin main
-            docker build -t backend-app .
-            docker restart apps-container
+      - name: Login to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u sameerpathania1 --password-stdin
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t ghcr.io/sameerpathania1/portfolio-backend:latest .
+          docker push ghcr.io/sameerpathania1/portfolio-backend:latest
