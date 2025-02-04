@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
-  res.send({ message: "Hello, world v1.0.0" });
+  res.send({ message: "Hello, world v1.1.0" });
 });
 
 app.listen(PORT, () => {
